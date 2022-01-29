@@ -1,16 +1,15 @@
-// simulate getting products from DataBase
+
 const products = [
   { name: "Apples:  ", country: "Italy", cost: 3, instock: 10 },
   { name: "Oranges: ", country: "Spain", cost: 4, instock: 3 },
   { name: "Beans:   ", country: "USA", cost: 2, instock: 5 },
   { name: "Cabbage: ", country: "USA", cost: 1, instock: 8 },
 ];
-//=========Cart=============
+
 const Cart = (props) => {
   const { Card, Accordion, Button } = ReactBootstrap;
   let data = props.location.data ? props.location.data : products;
   console.log(`data:${JSON.stringify(data)}`);
-
   return <Accordion defaultActiveKey="0">{list}</Accordion>;
 };
 
@@ -24,6 +23,7 @@ const useDataApi = (initialUrl, initialData) => {
     data: initialData,
   });
   console.log(`useDataApi called`);
+
   useEffect(() => {
     console.log("useEffect Called");
     let didCancel = false;
@@ -41,6 +41,7 @@ const useDataApi = (initialUrl, initialData) => {
         }
       }
     };
+
     fetchData();
     return () => {
       didCancel = true;
@@ -48,6 +49,7 @@ const useDataApi = (initialUrl, initialData) => {
   }, [url]);
   return [state, setUrl];
 };
+
 const dataFetchReducer = (state, action) => {
   switch (action.type) {
     case "FETCH_INIT":
@@ -88,6 +90,7 @@ const Products = (props) => {
     Image,
     Input,
   } = ReactBootstrap;
+
   //  Fetch Data
   const { Fragment, useState, useEffect, useReducer } = React;
   const [query, setQuery] = useState("http://localhost:1337/products");
@@ -98,14 +101,18 @@ const Products = (props) => {
     }
   );
   console.log(`Rendering Products ${JSON.stringify(data)}`);
+
   // Fetch Data
   const addToCart = (e) => {
     let name = e.target.name;
     let item = items.filter((item) => item.name == name);
+    if (item[0].instock == 0) return;
+    item[0].instock = item[0].instock - 1;
     console.log(`add to Cart ${JSON.stringify(item)}`);
     setCart([...cart, ...item]);
     //doFetch(query);
   };
+
   const deleteCartItem = (delIndex) => {
     let newCart = cart.filter((item, i) => delIndex != i);
     let target= cart.filter((item, index) => delIndex == index);
@@ -116,8 +123,8 @@ const Products = (props) => {
     setCart(newCart);
     setItems(newItems);
   };
-  const photos = ["apple.png", "orange.png", "beans.png", "cabbage.png"];
 
+  const photos = ["apple.png", "orange.png", "beans.png", "cabbage.png"];
   let list = items.map((item, index) => {
     let n = index + 1049;
     let uhit = "https://picsum.photos/id/" + n + "/50/50";
@@ -125,14 +132,14 @@ const Products = (props) => {
     return (
       <li key={index}>
         <Image src={uhit} width={70} roundedCircle></Image>
-        <Button variant="primary" size="large" >
-        {item.name} ${item.cost}. Stock = {item.instock}  add to cart
-        <input className="select" name={item.name} type="button" value="+"  onClick={addToCart}></input>
-        </Button>
-        
+        <br/>
+        {item.name}$ {item.cost} Stock = {item.instock}
+        <br/>
+        <input className="select" name={item.name} type="button" value="Add to Cart"  onClick={addToCart}></input>   
       </li>
     );
   });
+
   let cartList = cart.map((item, index) => {
     return (
       <Card key={index}>
@@ -172,8 +179,7 @@ const Products = (props) => {
     console.log(`total updated to ${newTotal}`);
     return newTotal;
   };
-  // TODO: implement the restockProducts function
-  
+   
   const restockProducts = (url) => {
     doFetch(url);
     let newItems = data.map((item) => {
@@ -215,5 +221,5 @@ const Products = (props) => {
     </Container>
   );
 };
-// ========================================
+
 ReactDOM.render(<Products />, document.getElementById("root"));
